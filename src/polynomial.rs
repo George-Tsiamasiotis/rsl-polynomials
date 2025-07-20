@@ -16,7 +16,7 @@ pub struct Polynomial<T> {
     pub order: usize,
 }
 
-impl<T: num::Float> Polynomial<T> {
+impl<T: num::complex::ComplexFloat> Polynomial<T> {
     /// Creates a new Polynomial from the given coefficients.
     ///
     /// ## Example
@@ -49,6 +49,9 @@ impl<T: num::Float> Polynomial<T> {
         let last_idx = self.order;
         let mut res = self.coef[last_idx];
 
+        // NOTE: `gsl_poly_complex_eval()` and `gsl_complex_poly_complex_eval()` seem to do the
+        // same thing as `gsl_poly_eval()`, but perform the complex addition and multiplication
+        // manually since its faster. I don't think this would make any difference here though.
         for i in (1..=last_idx).rev() {
             res = self.coef[i - 1] + x * res
         }

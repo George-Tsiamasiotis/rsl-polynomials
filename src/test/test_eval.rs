@@ -1,5 +1,6 @@
 use crate::Polynomial;
 use is_close::is_close;
+use num::complex::Complex64;
 use std::f64::{EPSILON, INFINITY, NAN};
 
 // GSL's tests use this tolerance
@@ -53,4 +54,67 @@ fn test_eval_nan_infinity() {
     let p = Polynomial::new(vec![1.0, 0.5, 0.3]);
     assert!(p.eval(INFINITY).is_infinite());
     assert!(p.eval(NAN).is_nan());
+}
+
+// ===============================================================================================
+
+#[test]
+/// Source: gsl/poly/test.c
+fn test_gsl_complex_eval1() {
+    let coef = Complex64::new(0.3, 0.0);
+    let p = Polynomial::new(vec![coef]);
+    let x = Complex64::new(0.75, 1.2);
+    let y = p.eval(x);
+
+    assert_eq!(p.order, 0);
+    assert!(is_close!(y.re, 0.3, rel_tol = EPS));
+    assert!(is_close!(y.im, 0.0, rel_tol = EPS));
+}
+
+#[test]
+/// Source: gsl/poly/test.c
+fn test_gsl_complex_eval2() {
+    let coefs = vec![
+        Complex64::new(2.1, 0.0),
+        Complex64::new(-1.34, 0.0),
+        Complex64::new(0.76, 0.0),
+        Complex64::new(0.45, 0.0),
+    ];
+    let p = Polynomial::new(coefs);
+    let x = Complex64::new(0.49, 0.95);
+    let y = p.eval(x);
+
+    assert_eq!(p.order, 3);
+    assert!(is_close!(y.re, 0.3959143, rel_tol = EPS));
+    assert!(is_close!(y.im, -0.6433305, rel_tol = EPS));
+}
+
+#[test]
+/// Source: gsl/poly/test.c
+fn test_gsl_complex_eval3() {
+    let coef = vec![Complex64::new(0.674, -1.423)];
+    let p = Polynomial::new(coef);
+    let x = Complex64::new(-1.44, 9.55);
+    let y = p.eval(x);
+
+    assert!(is_close!(y.re, 0.674, rel_tol = EPS));
+    assert!(is_close!(y.im, -1.423, rel_tol = EPS));
+}
+
+#[test]
+/// Source: gsl/poly/test.c
+fn test_gsl_complex_eval4() {
+    let coefs = vec![
+        Complex64::new(-2.31, 0.44),
+        Complex64::new(4.21, -3.19),
+        Complex64::new(0.93, 1.04),
+        Complex64::new(-0.42, 0.68),
+    ];
+    let p = Polynomial::new(coefs);
+    let x = Complex64::new(0.49, 0.95);
+    let y = p.eval(x);
+
+    assert_eq!(p.order, 3);
+    assert!(is_close!(y.re, 1.82462012, rel_tol = EPS));
+    assert!(is_close!(y.im, 2.30389412, rel_tol = EPS));
 }
