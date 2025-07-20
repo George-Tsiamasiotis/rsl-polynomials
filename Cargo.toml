@@ -1,0 +1,15 @@
+[package]
+name = "rsl-polynomials"
+authors = ["George Tsiamasiotis"]
+version = "0.1.0"
+edition = "2024"
+keywords = ["math", "science"]
+readme = "README.md"
+license = " GPL-3.0-only"
+documentation = "https://docs.rs/crate/rsl-polynomials/"
+repository = "https://github.com/George-Tsiamasiotis/rsl-polynomials.git"
+description = "A re-write of GSL's Polynomials Routines in Rust."
+
+[dependencies]
+is_close = "0.1.3"
+num = "0.4.3"
