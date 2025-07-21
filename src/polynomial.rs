@@ -1,5 +1,9 @@
 //! Methods for evaluating a polynomial and its derivatives on a certain point.
 
+use num::ToPrimitive;
+
+use crate::Result;
+
 #[allow(rustdoc::broken_intra_doc_links)]
 /// Representation of a polynomial.
 ///
@@ -16,7 +20,10 @@ pub struct Polynomial<T> {
     pub order: usize,
 }
 
-impl<T: num::complex::ComplexFloat> Polynomial<T> {
+impl<T> Polynomial<T>
+where
+    T: num::complex::ComplexFloat,
+{
     /// Creates a new Polynomial from the given coefficients.
     ///
     /// ## Example
@@ -105,5 +112,40 @@ impl<T: num::complex::ComplexFloat> Polynomial<T> {
         }
 
         res
+    }
+
+    /// Calculates the **real** roots af a quadratic equation `ax²+bx+c`.
+    ///
+    /// # Error
+    ///
+    /// Returns an error in 3 cases:
+    /// 1. the Polynomial is not of order 2
+    /// 2. one of the coefficients is not real
+    /// 3. the Polynomial is constant, i.e. a=b=0
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use rsl_polynomials::{Polynomial, Result};
+    /// #
+    /// # fn main() -> Result<()> {
+    /// let p = Polynomial::new(vec![-20.0, 0.0, 5.0]); // 5x²-20
+    /// let y = p.solve_real_quadratic()?;
+    /// let expected = vec![2.0, -2.0];
+    ///
+    /// assert_eq!(y, expected);
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[doc(alias = "gsl_poly_solve_quadratic")]
+    pub fn solve_real_quadratic(&self) -> Result<Vec<f64>> {
+        crate::utils::check_if_correct_order(&self.coef, 2)?;
+        crate::utils::check_if_real_coefficients(&self.coef)?;
+
+        let a = self.coef[2].re().to_f64().expect("Error converting to f64");
+        let b = self.coef[1].re().to_f64().expect("Error converting to f64");
+        let c = self.coef[0].re().to_f64().expect("Error converting to f64");
+
+        crate::solve::solve_real_quadratic(a, b, c)
     }
 }

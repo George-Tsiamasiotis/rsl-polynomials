@@ -12,7 +12,7 @@
 	- [ ] Hermite representation calculation [`gsl_poly_dd_hermite_init()`]
 	- [ ] Hermite representation evaluation [also `gsl_poly_dd_eval()`]
 - [ ] Quadratic Equations
-	- [ ] Calculation of real roots of quadratic equation [`gsl_poly_solve_quadratic()`]
+	- [x] Calculation of real roots of quadratic equation [`gsl_poly_solve_quadratic()`]
 	- [ ] Calculation of complex roots of quadratic equation [`gsl_poly_complex_solve_quadratic()`]
 - [ ] Cubix Equations
 	- [ ] Calculation of real roots of cubic equation [`gsl_poly_solve_cubic()`]
