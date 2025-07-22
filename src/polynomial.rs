@@ -2,7 +2,7 @@
 
 use num::ToPrimitive;
 
-use crate::Result;
+use crate::{PolyError, Result};
 
 #[allow(rustdoc::broken_intra_doc_links)]
 /// Representation of a polynomial.
@@ -13,11 +13,10 @@ use crate::Result;
 /// P(x) = c[0] + c[1]x + c[2]x² + ... + c[n−1]xⁿ⁻¹ + c[n]xⁿ
 ///
 /// [`Vec`]: std::vec::Vec
+#[derive(Debug)]
 pub struct Polynomial<T> {
     /// The polynomial's coefficients.
     pub coef: Vec<T>,
-    /// The order of the polynomial.
-    pub order: usize,
 }
 
 impl<T> Polynomial<T>
@@ -29,14 +28,17 @@ where
     /// ## Example
     ///
     /// ```
-    /// # use rsl_polynomials::Polynomial;
-    /// # fn main() {
-    /// let poly = Polynomial::new(vec![1.0, 0.4, 3.0]);
+    /// # use rsl_polynomials::{Polynomial, Result};
+    /// # fn main() -> Result<()> {
+    /// let poly = Polynomial::build(vec![1.0, 0.4, 3.0])?;
+    /// # Ok(())
     /// # }
     /// ```
-    pub fn new(coef: Vec<T>) -> Self {
-        let order = coef.len() - 1;
-        Polynomial { coef, order }
+    pub fn build(coef: Vec<T>) -> Result<Self> {
+        match coef.iter().any(|x| x.is_nan() | x.is_infinite()) {
+            true => Err(PolyError::InvalidCoefficients),
+            false => Ok(Polynomial { coef }),
+        }
     }
 
     /// Evaluates the polynomial for the value `x`.
@@ -44,16 +46,17 @@ where
     /// ## Example
     ///
     /// ```
-    /// # use rsl_polynomials::Polynomial;
-    /// # fn main() {
-    /// let poly = Polynomial::new(vec![1.0, 2.0, 3.0]);
+    /// # use rsl_polynomials::{Polynomial, Result};
+    /// # fn main() -> Result<()> {
+    /// let poly = Polynomial::build(vec![1.0, 2.0, 3.0])?;
     ///
     /// assert_eq!(poly.eval(1.0), 6.0);
     /// assert_eq!(poly.eval(-1.0), 2.0);
+    /// # Ok(())
     /// # }
     /// ```
     pub fn eval(&self, x: T) -> T {
-        let last_idx = self.order;
+        let last_idx = self.coef.len() - 1;
         let mut res = self.coef[last_idx];
 
         // NOTE: `gsl_poly_complex_eval()` and `gsl_complex_poly_complex_eval()` seem to do the
@@ -75,11 +78,12 @@ where
     /// ## Example
     ///
     /// ```
-    /// # use rsl_polynomials::Polynomial;
-    /// # fn main() {
-    /// let poly = Polynomial::new(vec![1.0, 2.0, 3.0]);
+    /// # use rsl_polynomials::{Polynomial, Result};
+    /// # fn main() -> Result<()> {
+    /// let poly = Polynomial::build(vec![1.0, 2.0, 3.0])?;
     ///
     /// assert_eq!(poly.eval_derivs(1.0, 4), vec![6.0, 8.0, 6.0, 0.0]);
+    /// # Ok(())
     /// # }
     /// ```
     pub fn eval_derivs(&self, x: T, n: usize) -> Vec<T> {
@@ -87,7 +91,7 @@ where
 
         let lenres = res.len();
         let lenpoly = self.coef.len(); // lenc
-        let last_idx = self.order;
+        let last_idx = self.coef.len() - 1;
         let nmax = lenpoly.min(lenres) - 1;
 
         // Partially fill res with the dominant term's coefficient
@@ -129,8 +133,8 @@ where
     /// # use rsl_polynomials::{Polynomial, Result};
     /// #
     /// # fn main() -> Result<()> {
-    /// let p = Polynomial::new(vec![-20.0, 0.0, 5.0]); // 5x²-20
-    /// let y = p.solve_real_quadratic()?;
+    /// let poly = Polynomial::build(vec![-20.0, 0.0, 5.0])?; // 5x²-20
+    /// let y = poly.solve_real_quadratic()?;
     /// let expected = vec![2.0, -2.0];
     ///
     /// assert_eq!(y, expected);

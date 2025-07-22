@@ -1,6 +1,10 @@
 #[derive(thiserror::Error, std::fmt::Debug)]
 /// The error type for Polynomial operations.
 pub enum PolyError {
+    /// Supplied coefficients are NaN or Infinity
+    #[error("Supplied coefficients cannot be NaN or Infinity")]
+    InvalidCoefficients,
+
     /// Supplied Polynomial is trivial.
     #[error("Supplied Polynomial is trivial.")]
     Trivial,
