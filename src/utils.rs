@@ -34,9 +34,9 @@ mod test {
 
     #[test]
     fn test_correct_order() {
-        let poly1 = Polynomial::build(vec![1.0]).unwrap();
-        let poly2 = Polynomial::build(vec![1.0, 2.0]).unwrap();
-        let poly3 = Polynomial::build(vec![1.0, 2.0, 3.0]).unwrap();
+        let poly1 = Polynomial::build(&vec![1.0]).unwrap();
+        let poly2 = Polynomial::build(&vec![1.0, 2.0]).unwrap();
+        let poly3 = Polynomial::build(&vec![1.0, 2.0, 3.0]).unwrap();
 
         assert!(check_if_correct_order(&poly1.coef, 0).is_ok());
         assert!(check_if_correct_order(&poly2.coef, 1).is_ok());
@@ -46,11 +46,11 @@ mod test {
 
     #[test]
     fn test_real_coefficients() {
-        let poly1 = Polynomial::build(vec![1.0]).unwrap();
-        let poly2 = Polynomial::build(vec![1.0, 2.0]).unwrap();
-        let poly3 = Polynomial::build(vec![Complex64::new(1.0, 1.0)]).unwrap();
+        let poly1 = Polynomial::build(&vec![1.0]).unwrap();
+        let poly2 = Polynomial::build(&vec![1.0, 2.0]).unwrap();
+        let poly3 = Polynomial::build(&vec![Complex64::new(1.0, 1.0)]).unwrap();
         let poly4 =
-            Polynomial::build(vec![Complex64::new(1.0, 1.0), Complex64::new(2.0, 2.0)]).unwrap();
+            Polynomial::build(&vec![Complex64::new(1.0, 1.0), Complex64::new(2.0, 2.0)]).unwrap();
 
         assert!(check_if_real_coefficients(&poly1.coef).is_ok());
         assert!(check_if_real_coefficients(&poly2.coef).is_ok());

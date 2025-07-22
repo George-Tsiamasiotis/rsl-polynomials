@@ -11,7 +11,7 @@ const EPS: f64 = 100.0 * EPSILON;
 #[test]
 /// Source: gsl/poly/test.c
 fn test_gsl_quadratic1() {
-    let p = Polynomial::build(vec![26.0, -20.0, 4.0]).unwrap();
+    let p = Polynomial::build(&vec![26.0, -20.0, 4.0]).unwrap();
 
     assert!(matches!(
         p.solve_real_quadratic().unwrap_err(),
@@ -22,7 +22,7 @@ fn test_gsl_quadratic1() {
 #[test]
 /// Source: gsl/poly/test.c
 fn test_gsl_quadratic2() {
-    let p = Polynomial::build(vec![25.0, -20.0, 4.0]).unwrap();
+    let p = Polynomial::build(&vec![25.0, -20.0, 4.0]).unwrap();
     let y = p.solve_real_quadratic().unwrap();
     let expected = vec![2.5];
 
@@ -33,7 +33,7 @@ fn test_gsl_quadratic2() {
 #[test]
 /// Source: gsl/poly/test.c
 fn test_gsl_quadratic3() {
-    let p = Polynomial::build(vec![21.0, -20.0, 4.0]).unwrap();
+    let p = Polynomial::build(&vec![21.0, -20.0, 4.0]).unwrap();
     let y = p.solve_real_quadratic().unwrap();
     let expected = vec![3.5, 1.5];
 
@@ -44,7 +44,7 @@ fn test_gsl_quadratic3() {
 #[test]
 /// Source: gsl/poly/test.c
 fn test_gsl_quadratic4() {
-    let p = Polynomial::build(vec![0.0, 7.0, 4.0]).unwrap();
+    let p = Polynomial::build(&vec![0.0, 7.0, 4.0]).unwrap();
     let y = p.solve_real_quadratic().unwrap();
     let expected = vec![0.0, -1.75];
 
@@ -55,7 +55,7 @@ fn test_gsl_quadratic4() {
 #[test]
 /// Source: gsl/poly/test.c
 fn test_gsl_quadratic5() {
-    let p = Polynomial::build(vec![-20.0, 0.0, 5.0]).unwrap();
+    let p = Polynomial::build(&vec![-20.0, 0.0, 5.0]).unwrap();
     let y = p.solve_real_quadratic().unwrap();
     let expected = vec![2.0, -2.0];
 
@@ -66,7 +66,7 @@ fn test_gsl_quadratic5() {
 #[test]
 /// Source: gsl/poly/test.c
 fn test_gsl_quadratic6() {
-    let p = Polynomial::build(vec![-21.0, 3.0, 0.0]).unwrap();
+    let p = Polynomial::build(&vec![-21.0, 3.0, 0.0]).unwrap();
     let y = p.solve_real_quadratic().unwrap();
     let expected = vec![7.0];
 
@@ -76,7 +76,7 @@ fn test_gsl_quadratic6() {
 #[test]
 /// Source: gsl/poly/test.c
 fn test_gsl_quadratic7() {
-    let p = Polynomial::build(vec![1.0, 0.0, 0.0]).unwrap();
+    let p = Polynomial::build(&vec![1.0, 0.0, 0.0]).unwrap();
 
     assert!(matches!(
         p.solve_real_quadratic().unwrap_err(),
@@ -88,7 +88,7 @@ fn test_gsl_quadratic7() {
 
 #[test]
 fn test_solve_real_quadratic_wrong_order() {
-    let p = Polynomial::build(vec![1.0, 2.0, 3.0, 4.0]).unwrap();
+    let p = Polynomial::build(&vec![1.0, 2.0, 3.0, 4.0]).unwrap();
 
     assert!(matches!(
         p.solve_real_quadratic().unwrap_err(),
@@ -98,7 +98,7 @@ fn test_solve_real_quadratic_wrong_order() {
 
 #[test]
 fn test_solve_real_quadratic_complex_coefs() {
-    let p = Polynomial::build(vec![
+    let p = Polynomial::build(&vec![
         Complex64::new(1.0, 2.0),
         Complex64::new(3.0, 4.0),
         Complex64::new(5.0, 6.0),

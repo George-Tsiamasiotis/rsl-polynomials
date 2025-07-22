@@ -30,14 +30,14 @@ where
     /// ```
     /// # use rsl_polynomials::{Polynomial, Result};
     /// # fn main() -> Result<()> {
-    /// let poly = Polynomial::build(vec![1.0, 0.4, 3.0])?;
+    /// let poly = Polynomial::build(&vec![1.0, 0.4, 3.0])?;
     /// # Ok(())
     /// # }
     /// ```
-    pub fn build(coef: Vec<T>) -> Result<Self> {
+    pub fn build(coef: &Vec<T>) -> Result<Self> {
         match coef.iter().any(|x| x.is_nan() | x.is_infinite()) {
             true => Err(PolyError::InvalidCoefficients),
-            false => Ok(Polynomial { coef }),
+            false => Ok(Polynomial { coef: coef.clone() }),
         }
     }
 
@@ -48,7 +48,7 @@ where
     /// ```
     /// # use rsl_polynomials::{Polynomial, Result};
     /// # fn main() -> Result<()> {
-    /// let poly = Polynomial::build(vec![1.0, 2.0, 3.0])?;
+    /// let poly = Polynomial::build(&vec![1.0, 2.0, 3.0])?;
     ///
     /// assert_eq!(poly.eval(1.0), 6.0);
     /// assert_eq!(poly.eval(-1.0), 2.0);
@@ -83,7 +83,7 @@ where
     /// ```
     /// # use rsl_polynomials::{Polynomial, Result};
     /// # fn main() -> Result<()> {
-    /// let poly = Polynomial::build(vec![1.0, 2.0, 3.0])?;
+    /// let poly = Polynomial::build(&vec![1.0, 2.0, 3.0])?;
     ///
     /// assert_eq!(poly.eval_derivs(1.0, 4), vec![6.0, 8.0, 6.0, 0.0]);
     /// # Ok(())
@@ -134,7 +134,7 @@ where
     /// # use rsl_polynomials::{Polynomial, Result};
     /// #
     /// # fn main() -> Result<()> {
-    /// let poly = Polynomial::build(vec![-20.0, 0.0, 5.0])?; // 5x²-20
+    /// let poly = Polynomial::build(&vec![-20.0, 0.0, 5.0])?; // 5x²-20
     /// let y = poly.solve_real_quadratic()?;
     /// let expected = vec![2.0, -2.0];
     ///
