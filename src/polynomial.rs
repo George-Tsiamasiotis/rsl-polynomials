@@ -56,16 +56,19 @@ where
     /// # }
     /// ```
     pub fn eval(&self, x: T) -> T {
-        let last_idx = self.coef.len() - 1;
-        let mut res = self.coef[last_idx];
+        // NOTE: This evaluates a₀+a₁x+a₂x²+...+aₙx² as if it were in the form
+        // a₀+x(a₁+x(a₂+ x(...))), therefore saving a lot of reduntant multiplications.
 
         // NOTE: `gsl_poly_complex_eval()` and `gsl_complex_poly_complex_eval()` seem to do the
         // same thing as `gsl_poly_eval()`, but perform the complex addition and multiplication
-        // manually since its faster. I don't think this would make any difference here though.
-        for i in (1..=last_idx).rev() {
-            res = self.coef[i - 1] + x * res
-        }
-        res
+        // manually since its slightly faster.
+
+        self.coef
+            .iter()
+            .rev()
+            .copied()
+            .reduce(|res, coef| coef + x * res)
+            .unwrap_or(T::zero())
     }
 
     /// Evaluates the polynomials first `n` derivatives (including the 0-th derivative, i.e. the
@@ -89,15 +92,13 @@ where
     pub fn eval_derivs(&self, x: T, n: usize) -> Vec<T> {
         let mut res: Vec<T> = vec![T::zero(); n];
 
-        let lenres = res.len();
-        let lenpoly = self.coef.len(); // lenc
         let last_idx = self.coef.len() - 1;
-        let nmax = lenpoly.min(lenres) - 1;
+        let nmax = self.coef.len().min(res.len()) - 1;
 
         // Partially fill res with the dominant term's coefficient
-        for d in res.iter_mut().take(nmax + 1) {
-            *d = self.coef[last_idx]
-        }
+        res.iter_mut()
+            .take(nmax + 1)
+            .for_each(|e| *e = *self.coef.last().unwrap());
 
         for i in 0..last_idx {
             let k = last_idx - i;
