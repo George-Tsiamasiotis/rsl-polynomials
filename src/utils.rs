@@ -1,6 +1,35 @@
 use crate::{PolyError, Result};
 use num::ToPrimitive;
 
+/// Trails all trailing zeros of a Vec.
+pub(crate) fn trim_trailing_zeros<T>(values: &Vec<T>) -> Vec<T>
+where
+    T: num::complex::ComplexFloat,
+{
+    // Leave [0.0] polynomial as is
+    if values.len() == 1 {
+        return values.to_owned();
+    }
+
+    // Trim leading zeros, then reverse
+    let mut keep_trimming = true;
+    let mut filtered_values: Vec<T> = values
+        .clone()
+        .into_iter()
+        .rev()
+        .filter(|e| {
+            if e.is_zero() & keep_trimming {
+                return false;
+            };
+            keep_trimming = false;
+            true
+        })
+        .collect();
+
+    filtered_values.reverse();
+    filtered_values
+}
+
 /// Checks if a polynomial is of the expected order.
 pub(crate) fn check_if_correct_order<T>(coef: &[T], expected_order: usize) -> Result<()> {
     if coef.len() != expected_order + 1 {
@@ -31,6 +60,30 @@ mod test {
     use crate::Polynomial;
 
     use super::*;
+
+    #[test]
+    fn test_trim_trailing_zeros() {
+        let mut poly0 = Polynomial::build(&vec![0.0]).unwrap();
+        let mut poly1 = Polynomial::build(&vec![0.0, 1.0, 2.0]).unwrap();
+        let mut poly2 = Polynomial::build(&vec![0.0, 1.0, 2.0, 0.0, 0.0]).unwrap();
+        let mut poly3 = Polynomial::build(&vec![1.0, 2.0]).unwrap();
+        let mut poly4 = Polynomial::build(&vec![1.0, 2.0, 0.0, 0.0]).unwrap();
+        let mut poly5 = Polynomial::build(&vec![1.0, 0.0, 2.0]).unwrap();
+
+        poly0.trim();
+        poly1.trim();
+        poly2.trim();
+        poly3.trim();
+        poly4.trim();
+        poly5.trim();
+
+        assert_eq!(poly0.coef, vec![0.0]);
+        assert_eq!(poly1.coef, vec![0.0, 1.0, 2.0]);
+        assert_eq!(poly2.coef, vec![0.0, 1.0, 2.0]);
+        assert_eq!(poly3.coef, vec![1.0, 2.0]);
+        assert_eq!(poly4.coef, vec![1.0, 2.0]);
+        assert_eq!(poly5.coef, vec![1.0, 0.0, 2.0]);
+    }
 
     #[test]
     fn test_correct_order() {

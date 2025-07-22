@@ -34,11 +34,32 @@ where
     /// # Ok(())
     /// # }
     /// ```
-    pub fn build(coef: &Vec<T>) -> Result<Self> {
+    pub fn build(coef: &[T]) -> Result<Self> {
         match coef.iter().any(|x| x.is_nan() | x.is_infinite()) {
             true => Err(PolyError::InvalidCoefficients),
-            false => Ok(Polynomial { coef: coef.clone() }),
+            false => Ok(Polynomial {
+                coef: coef.to_vec(),
+            }),
         }
+    }
+
+    /// Trims the higher order terms with 0 coefficient.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use rsl_polynomials::{Polynomial, Result};
+    /// # fn main() -> Result<()> {
+    /// let mut poly1 = Polynomial::build(&vec![0.0, 1.0, 2.0, 0.0, 0.0])?;
+    /// // x+2x²+0x³+0x⁴ −> x+2x²
+    /// poly1.trim();
+    ///
+    /// assert_eq!(poly1.coef, vec![0.0, 1.0, 2.0]);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn trim(&mut self) {
+        self.coef = crate::utils::trim_trailing_zeros(&self.coef)
     }
 
     /// Evaluates the polynomial for the value `x`.
