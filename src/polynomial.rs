@@ -13,7 +13,7 @@ use crate::{PolyError, Result};
 /// P(x) = c[0] + c[1]x + c[2]x² + ... + c[n−1]xⁿ⁻¹ + c[n]xⁿ
 ///
 /// [`Vec`]: std::vec::Vec
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Polynomial<T> {
     /// The polynomial's coefficients.
     pub coef: Vec<T>,
@@ -207,5 +207,16 @@ where
 {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl<T> std::fmt::Debug for Polynomial<T>
+where
+    T: std::fmt::Debug,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Polynomial")
+            .field("Coefficients", &self.coef)
+            .finish()
     }
 }
