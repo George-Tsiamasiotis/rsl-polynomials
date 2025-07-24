@@ -110,7 +110,7 @@ dependencies = [
 
 [[package]]
 name = "rsl-polynomials"
-version = "0.1.3"
+version = "0.1.3-pre.1"
 dependencies = [
  "is_close",
  "num",

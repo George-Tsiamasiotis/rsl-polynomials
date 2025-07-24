@@ -1,10 +1,11 @@
-use crate::{PolyError, Polynomial};
+//! GSL's tests
+
+use crate::Polynomial;
 use is_close::is_close;
 use num::complex::Complex64;
-use std::f64::EPSILON;
 
 // GSL's tests use this tolerance
-const EPS: f64 = 100.0 * EPSILON;
+const EPS: f64 = 100.0 * f64::EPSILON;
 
 #[test]
 /// Source: gsl/poly/test.c
@@ -46,17 +47,6 @@ fn test_gsl_eval_deriv1() {
     assert!(is_close!(derivs[4], 480.0, rel_tol = EPS));
     assert!(is_close!(derivs[5], -720.0, rel_tol = EPS));
 }
-
-#[test]
-fn test_build_invalid_coefficients() {
-    let poly1 = Polynomial::build(&vec![1.0, 2.0, std::f64::NAN]);
-    let poly2 = Polynomial::build(&vec![1.0, 2.0, std::f64::INFINITY]);
-
-    assert!(matches!(poly1.unwrap_err(), PolyError::InvalidCoefficients));
-    assert!(matches!(poly2.unwrap_err(), PolyError::InvalidCoefficients));
-}
-
-// ===============================================================================================
 
 #[test]
 /// Source: gsl/poly/test.c

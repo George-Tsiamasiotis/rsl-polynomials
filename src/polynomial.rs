@@ -1,6 +1,6 @@
 //! Methods for evaluating a polynomial and its derivatives on a certain point.
 
-use num::ToPrimitive;
+use num::{ToPrimitive, Zero};
 
 use crate::{PolyError, Result};
 
@@ -23,6 +23,13 @@ impl<T> Polynomial<T>
 where
     T: num::complex::ComplexFloat,
 {
+    /// Creates a new Polynomial with no terms (zero polynomial).
+    pub fn new() -> Self {
+        Polynomial {
+            coef: vec![T::zero()],
+        }
+    }
+
     /// Creates a new Polynomial from the given coefficients.
     ///
     /// ## Example
@@ -35,6 +42,10 @@ where
     /// # }
     /// ```
     pub fn build(coef: &[T]) -> Result<Self> {
+        if coef.len().is_zero() {
+            return Ok(Polynomial::new());
+        }
+
         match coef.iter().any(|x| x.is_nan() | x.is_infinite()) {
             true => Err(PolyError::InvalidCoefficients),
             false => Ok(Polynomial {
@@ -173,5 +184,14 @@ where
         let c = self.coef[0].re().to_f64().expect("Error converting to f64");
 
         crate::solve::solve_real_quadratic(a, b, c)
+    }
+}
+
+impl<T> Default for Polynomial<T>
+where
+    T: num::complex::ComplexFloat,
+{
+    fn default() -> Self {
+        Self::new()
     }
 }
