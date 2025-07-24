@@ -87,6 +87,32 @@ where
         Polynomial { coef: new_coeffs }
     }
 
+    /// Converts a general polynomial to a monic polynomial:
+    /// ax³ + bx² + cx + d  −>  x³ + ax² + bx + c
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// # use rsl_polynomials::{Polynomial, Result};
+    /// # fn main() -> Result<()> {
+    /// let poly = Polynomial::build(&vec![30.0, 6.0, 3.0])?.to_monic();
+    ///
+    /// assert_eq!(poly.coef, vec![10.0, 2.0, 1.0]);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn to_monic(&self) -> Self {
+        // Leave [0.0] polynomial as is
+        if self.coef.len() == 1 {
+            return self.clone();
+        }
+
+        let mut monic = self.to_trimmed();
+        let a = *monic.coef.last().unwrap();
+        monic.coef.iter_mut().for_each(|e| *e = *e / a);
+        monic
+    }
+
     /// Evaluates the polynomial for the value `x`.
     ///
     /// ## Example
@@ -101,6 +127,7 @@ where
     /// # Ok(())
     /// # }
     /// ```
+    #[doc(alias = "gsl_poly_eval")]
     pub fn eval(&self, x: T) -> T {
         // NOTE: This evaluates a₀+a₁x+a₂x²+...+aₙx² as if it were in the form
         // a₀+x(a₁+x(a₂+ x(...))), therefore saving a lot of reduntant multiplications.
@@ -135,6 +162,7 @@ where
     /// # Ok(())
     /// # }
     /// ```
+    #[doc(alias = "gsl_poly_eval_derivs")]
     pub fn eval_derivs(&self, x: T, n: usize) -> Vec<T> {
         let mut res: Vec<T> = vec![T::zero(); n];
 

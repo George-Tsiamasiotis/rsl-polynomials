@@ -4,7 +4,7 @@
 	- [x] real coefficients and variable [`gsl_poly_eval()`]
 	- [x] real coefficients, complex variable [`gsl_poly_complex_eval()`]
 	- [x] complex coefficients and variable [`gsl_complex_poly_complex_eval()`].
-	- [x] Polynomial derivatives evaluation [`gsl_eval_derivs()`].
+	- [x] Polynomial derivatives evaluation [`gsl_poly_eval_derivs()`].
 - [ ] Divided Differences
 	- [ ] representation calculation [`gsl_poly_dd_init()`]
 	- [ ] evaluation ['gsl_poly_dd_eval()']

@@ -60,3 +60,17 @@ fn test_debug() {
     let _ = format!("{:?}", poly);
     let _ = format!("{:#?}", poly);
 }
+
+#[test]
+#[rustfmt::skip]
+fn test_monic() {
+    let poly0 = Polynomial::build(&vec![0.0]).unwrap().to_monic();
+    let poly1 = Polynomial::build(&vec![0.0, 8.0, 4.0]).unwrap().to_monic();
+    let poly2 = Polynomial::build(&vec![6.0, 0.0, 3.0]).unwrap().to_monic();
+    let poly3 = Polynomial::build(&vec![0.0, 2.0, 2.0, 0.0, 0.0]).unwrap().to_monic();
+
+    assert_eq!(poly0.coef, vec![0.0]);
+    assert_eq!(poly1.coef, vec![0.0, 2.0, 1.0]);
+    assert_eq!(poly2.coef, vec![2.0, 0.0, 1.0]);
+    assert_eq!(poly3.coef, vec![0.0, 1.0, 1.0]);
+}
