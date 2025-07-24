@@ -13,7 +13,7 @@ use crate::{PolyError, Result};
 /// P(x) = c[0] + c[1]x + c[2]x² + ... + c[n−1]xⁿ⁻¹ + c[n]xⁿ
 ///
 /// [`Vec`]: std::vec::Vec
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Polynomial<T> {
     /// The polynomial's coefficients.
     pub coef: Vec<T>,
@@ -37,7 +37,7 @@ where
     /// ```
     /// # use rsl_polynomials::{Polynomial, Result};
     /// # fn main() -> Result<()> {
-    /// let poly = Polynomial::build(&vec![1.0, 0.4, 3.0])?;
+    /// let poly = Polynomial::build(&vec![1.0, 4.0, 3.0])?; // 1+4x+3x²
     /// # Ok(())
     /// # }
     /// ```
@@ -61,16 +61,30 @@ where
     /// ```
     /// # use rsl_polynomials::{Polynomial, Result};
     /// # fn main() -> Result<()> {
-    /// let mut poly1 = Polynomial::build(&vec![0.0, 1.0, 2.0, 0.0, 0.0])?;
-    /// // x+2x²+0x³+0x⁴ −> x+2x²
-    /// poly1.trim();
+    /// // 0+x+0+2x³+0 −> x+2x³
+    /// let poly1 = Polynomial::build(&vec![0.0, 1.0, 0.0, 2.0, 0.0])?.to_trimmed();
     ///
-    /// assert_eq!(poly1.coef, vec![0.0, 1.0, 2.0]);
+    /// assert_eq!(poly1.coef, vec![0.0, 1.0, 0.0, 2.0]);
     /// # Ok(())
     /// # }
     /// ```
-    pub fn trim(&mut self) {
-        self.coef = crate::utils::trim_trailing_zeros(&self.coef)
+    pub fn to_trimmed(&self) -> Self {
+        // Leave [0.0] polynomial as is
+        if self.coef.len() == 1 {
+            return self.clone();
+        }
+
+        let mut iter = self.coef.iter().rev().copied().peekable();
+        let mut new_coeffs = self.coef.clone();
+
+        new_coeffs.reverse();
+        while iter.peek().is_some_and(|c| c.is_zero()) {
+            new_coeffs.remove(0);
+            iter.next();
+        }
+        new_coeffs.reverse();
+
+        Polynomial { coef: new_coeffs }
     }
 
     /// Evaluates the polynomial for the value `x`.

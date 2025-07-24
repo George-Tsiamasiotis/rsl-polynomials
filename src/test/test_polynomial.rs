@@ -17,20 +17,14 @@ fn test_build_polynomial_invalid() {
 }
 
 #[test]
+#[rustfmt::skip]
 fn test_trim_trailing_zeros() {
-    let mut poly0 = Polynomial::build(&vec![0.0]).unwrap();
-    let mut poly1 = Polynomial::build(&vec![0.0, 1.0, 2.0]).unwrap();
-    let mut poly2 = Polynomial::build(&vec![0.0, 1.0, 2.0, 0.0, 0.0]).unwrap();
-    let mut poly3 = Polynomial::build(&vec![1.0, 2.0]).unwrap();
-    let mut poly4 = Polynomial::build(&vec![1.0, 2.0, 0.0, 0.0]).unwrap();
-    let mut poly5 = Polynomial::build(&vec![1.0, 0.0, 2.0]).unwrap();
-
-    poly0.trim();
-    poly1.trim();
-    poly2.trim();
-    poly3.trim();
-    poly4.trim();
-    poly5.trim();
+    let poly0 = Polynomial::build(&vec![0.0]).unwrap().to_trimmed();
+    let poly1 = Polynomial::build(&vec![0.0, 1.0, 2.0]).unwrap().to_trimmed();
+    let poly2 = Polynomial::build(&vec![0.0, 1.0, 2.0, 0.0, 0.0]).unwrap().to_trimmed();
+    let poly3 = Polynomial::build(&vec![1.0, 2.0]).unwrap().to_trimmed();
+    let poly4 = Polynomial::build(&vec![1.0, 2.0, 0.0, 0.0]).unwrap().to_trimmed();
+    let poly5 = Polynomial::build(&vec![1.0, 0.0, 2.0]).unwrap().to_trimmed();
 
     assert_eq!(poly0.coef, vec![0.0]);
     assert_eq!(poly1.coef, vec![0.0, 1.0, 2.0]);

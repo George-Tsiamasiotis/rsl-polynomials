@@ -1,35 +1,6 @@
 use crate::{PolyError, Result};
 use num::ToPrimitive;
 
-/// Trails all trailing zeros of a Vec.
-pub(crate) fn trim_trailing_zeros<T>(values: &Vec<T>) -> Vec<T>
-where
-    T: num::complex::ComplexFloat,
-{
-    // Leave [0.0] polynomial as is
-    if values.len() == 1 {
-        return values.to_owned();
-    }
-
-    // Trim leading zeros, then reverse
-    let mut keep_trimming = true;
-    let mut filtered_values: Vec<T> = values
-        .clone()
-        .into_iter()
-        .rev()
-        .filter(|e| {
-            if e.is_zero() & keep_trimming {
-                return false;
-            };
-            keep_trimming = false;
-            true
-        })
-        .collect();
-
-    filtered_values.reverse();
-    filtered_values
-}
-
 /// Checks if a polynomial is of the expected order.
 pub(crate) fn check_if_correct_order<T>(coef: &[T], expected_order: usize) -> Result<()> {
     if coef.len() != expected_order + 1 {
