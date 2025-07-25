@@ -5,6 +5,10 @@ pub enum PolyError {
     #[error("Supplied coefficients cannot be NaN or Infinity")]
     InvalidCoefficients,
 
+    /// Cannot convert Complex to Float.
+    #[error("Cannot convert complex {0} to float.")]
+    ComplexTof64Conversion(Box<str>),
+
     /// Supplied Polynomial is trivial.
     #[error("Supplied Polynomial is trivial.")]
     Trivial,

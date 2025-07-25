@@ -1,5 +1,5 @@
 use crate::{PolyError, Result};
-use num::ToPrimitive;
+use num::{ToPrimitive, Zero};
 
 /// Checks if a polynomial is of the expected order.
 pub(crate) fn check_if_correct_order<T>(coef: &[T], expected_order: usize) -> Result<()> {
@@ -22,6 +22,21 @@ pub(crate) fn check_if_real_coefficients<C: num::complex::ComplexFloat>(coef: &[
         }
     }
     Ok(())
+}
+
+/// Converts a Complex number to f64. Returns an Error if the complex number has an imaginary part.
+pub(crate) fn convert_complex_to_real<C>(number: C) -> Result<f64>
+where
+    C: num::complex::ComplexFloat + std::fmt::Debug,
+{
+    let err = PolyError::ComplexTof64Conversion(format!("{number:?}").into());
+
+    // Complex64.to_f64() returns the real part, even if the imaginary part is not 0.
+    if !number.is_finite() | !number.im().is_zero() {
+        return Err(err);
+    }
+
+    number.re().to_f64().ok_or(err)
 }
 
 #[cfg(test)]
@@ -56,5 +71,17 @@ mod test {
         assert!(check_if_real_coefficients(&poly2.coef).is_ok());
         assert!(check_if_real_coefficients(&poly3.coef).is_err());
         assert!(check_if_real_coefficients(&poly4.coef).is_err());
+    }
+
+    #[test]
+    fn test_complex_to_f64_conversion() {
+        let c1 = Complex64::new(1.0, 0.0);
+        let c2 = Complex64::new(1.0, 1.0);
+
+        assert_eq!(convert_complex_to_real(c1).unwrap(), 1.0f64);
+        assert!(matches!(
+            convert_complex_to_real(c2).unwrap_err(),
+            PolyError::ComplexTof64Conversion(_)
+        ))
     }
 }

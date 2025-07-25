@@ -1,8 +1,11 @@
 //! Methods for evaluating a polynomial and its derivatives on a certain point.
 
-use num::{ToPrimitive, Zero};
+use num::Zero;
 
-use crate::{PolyError, Result};
+use crate::{
+    PolyError, Result, solve,
+    utils::{check_if_correct_order, check_if_real_coefficients, convert_complex_to_real},
+};
 
 #[allow(rustdoc::broken_intra_doc_links)]
 /// Representation of a polynomial.
@@ -14,14 +17,17 @@ use crate::{PolyError, Result};
 ///
 /// [`Vec`]: std::vec::Vec
 #[derive(Clone)]
-pub struct Polynomial<T> {
+pub struct Polynomial<T>
+where
+    T: std::fmt::Debug,
+{
     /// The polynomial's coefficients.
     pub coef: Vec<T>,
 }
 
 impl<T> Polynomial<T>
 where
-    T: num::complex::ComplexFloat,
+    T: num::complex::ComplexFloat + std::fmt::Debug,
 {
     /// Creates a new Polynomial with no terms (zero polynomial).
     pub fn new() -> Self {
@@ -218,20 +224,21 @@ where
     /// ```
     #[doc(alias = "gsl_poly_solve_quadratic")]
     pub fn solve_real_quadratic(&self) -> Result<Vec<f64>> {
-        crate::utils::check_if_correct_order(&self.coef, 2)?;
-        crate::utils::check_if_real_coefficients(&self.coef)?;
+        check_if_correct_order(&self.coef, 2)?;
+        check_if_real_coefficients(&self.coef)?;
 
-        let a = self.coef[2].re().to_f64().expect("Error converting to f64");
-        let b = self.coef[1].re().to_f64().expect("Error converting to f64");
-        let c = self.coef[0].re().to_f64().expect("Error converting to f64");
+        let mut reals = Vec::<f64>::new();
+        for c in self.coef.iter() {
+            reals.push(convert_complex_to_real(*c)?);
+        }
 
-        crate::solve::solve_real_quadratic(a, b, c)
+        solve::solve_real_quadratic(reals[2], reals[1], reals[0])
     }
 }
 
 impl<T> Default for Polynomial<T>
 where
-    T: num::complex::ComplexFloat,
+    T: num::complex::ComplexFloat + std::fmt::Debug,
 {
     fn default() -> Self {
         Self::new()
