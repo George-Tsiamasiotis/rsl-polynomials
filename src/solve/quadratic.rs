@@ -1,5 +1,3 @@
-//! Methods for solving linear, quadratic, cubic(todo) and quartic(maybe todo) equations.
-
 use std::cmp::Ordering;
 
 use crate::solve::linear::solve_real_linear;

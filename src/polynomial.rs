@@ -234,6 +234,44 @@ where
 
         solve::solve_real_quadratic(reals[2], reals[1], reals[0])
     }
+
+    /// Calculates the **real** roots af a quadratic equation `ax³+bx²+cx+d`.
+    ///
+    /// # Error
+    ///
+    /// Returns an error in 3 cases:
+    /// 1. the Polynomial is not of order 3
+    /// 2. one of the coefficients is not real
+    /// 3. the Polynomial is constant, i.e. a=b=c=0
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use rsl_polynomials::{Polynomial, Result};
+    /// #
+    /// # fn main() -> Result<()> {
+    /// let poly = Polynomial::build(&vec![-6.0, 11.0, -6.0, 1.0])?; // x³-6x²+11x-6
+    /// let y = poly.solve_real_cubic()?;
+    /// let expected = vec![2.0, -2.0]; // TODO:
+    ///
+    /// assert_eq!(y, expected);
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[doc(alias = "gsl_poly_solve_cubic")]
+    pub fn solve_real_cubic(&self) -> Result<Vec<f64>> {
+        check_if_correct_order(&self.coef, 3)?;
+        check_if_real_coefficients(&self.coef)?;
+
+        let monic = self.to_monic();
+
+        let mut reals = Vec::<f64>::new();
+        for c in monic.coef.iter().skip(1) {
+            reals.push(convert_complex_to_real(*c)?);
+        }
+
+        solve::solve_real_cubic(reals[2], reals[1], reals[0])
+    }
 }
 
 impl<T> Default for Polynomial<T>
