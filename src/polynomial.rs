@@ -21,7 +21,7 @@ pub struct Polynomial<T>
 where
     T: std::fmt::Debug,
 {
-    /// The polynomial's coefficients.
+    /// The polynomial's coefficients, from constant to leading term.
     pub coef: Vec<T>,
 }
 
@@ -93,8 +93,8 @@ where
         Polynomial { coef: new_coeffs }
     }
 
-    /// Converts a general polynomial to a monic polynomial:
-    /// ax³ + bx² + cx + d  −>  x³ + ax² + bx + c
+    /// Converts a general polynomial to a [`monic`] polynomial:
+    /// ax³ + bx² + cx + d  −>  x³ + a'x² + b'x + c'
     ///
     /// ## Example
     ///
@@ -107,6 +107,8 @@ where
     /// # Ok(())
     /// # }
     /// ```
+    ///
+    /// [`monic`]: https://en.wikipedia.org/wiki/Monic_polynomial
     pub fn to_monic(&self) -> Self {
         // Leave [0.0] polynomial as is
         if self.coef.len() == 1 {
@@ -119,7 +121,7 @@ where
         monic
     }
 
-    /// Converts a general cubic polynomial to a depressed cubic polynomial:
+    /// Converts a general cubic polynomial to a [`depressed cubic`] polynomial:
     /// ax³ + bx³ + cx + d  −> t³ + pt + q,  where t = x − b/3a
     ///
     /// ## Example
@@ -131,6 +133,8 @@ where
     /// # Ok(())
     /// # }
     /// ```
+    ///
+    /// [`depressed cubic`]: https://en.wikipedia.org/wiki/Cubic_equation#Depressed_cubic
     pub fn to_depressed_cubic(&self) -> Result<Polynomial<f64>> {
         let poly = self.to_trimmed();
         check_if_real_coefficients(&poly.coef)?;
@@ -249,7 +253,7 @@ where
     /// # fn main() -> Result<()> {
     /// let poly = Polynomial::build(&[-20.0, 0.0, 5.0])?; // 5x²-20
     /// let y = poly.solve_real_quadratic()?;
-    /// let expected = vec![2.0, -2.0];
+    /// let expected = [2.0, -2.0];
     ///
     /// assert_eq!(y, expected);
     /// # Ok(())
@@ -270,6 +274,13 @@ where
 
     /// Calculates the **real** roots af a quadratic equation `ax³+bx²+cx+d`.
     ///
+    /// The roots are returned in increasing order.
+    ///
+    /// ## Note
+    ///
+    /// Due to finite precision, some double roots may be missed, and considered to be a
+    /// pair of complex roots z = x ± i*EPSILON close to the real axis.
+    ///
     /// # Error
     ///
     /// Returns an error in 3 cases:
@@ -285,7 +296,7 @@ where
     /// # fn main() -> Result<()> {
     /// let poly = Polynomial::build(&[-6.0, 11.0, -6.0, 1.0])?; // x³-6x²+11x-6
     /// let y = poly.solve_real_cubic()?;
-    /// let expected = vec![2.0, -2.0]; // TODO:
+    /// let expected = [1.0, 2.0, 3.0];
     ///
     /// assert_eq!(y, expected);
     /// # Ok(())
@@ -299,7 +310,7 @@ where
         let monic = self.to_monic();
 
         let mut reals = Vec::<f64>::new();
-        for c in monic.coef.iter().skip(1) {
+        for c in monic.coef.iter() {
             reals.push(convert_complex_to_real(*c)?);
         }
 

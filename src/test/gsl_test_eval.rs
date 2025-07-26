@@ -10,7 +10,7 @@ const EPS: f64 = 100.0 * f64::EPSILON;
 #[test]
 /// Source: gsl/poly/test.c
 fn test_gsl_eval1() {
-    let p = Polynomial::build(&vec![1.0, 0.5, 0.3]).unwrap();
+    let p = Polynomial::build(&[1.0, 0.5, 0.3]).unwrap();
     let x = 0.5;
 
     assert!(is_close!(
@@ -23,10 +23,8 @@ fn test_gsl_eval1() {
 #[test]
 /// Source: gsl/poly/test.c
 fn test_gsl_eval2() {
-    let p = Polynomial::build(&vec![
-        1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0,
-    ])
-    .unwrap();
+    let p =
+        Polynomial::build(&[1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0]).unwrap();
     let x = 1.0;
 
     assert!(is_close!(p.eval(x), 1.0, rel_tol = EPS));
@@ -35,7 +33,7 @@ fn test_gsl_eval2() {
 #[test]
 /// Source: gsl/poly/test.c
 fn test_gsl_eval_deriv1() {
-    let p = Polynomial::build(&vec![1.0, -2.0, 3.0, -4.0, 5.0, -6.0]).unwrap();
+    let p = Polynomial::build(&[1.0, -2.0, 3.0, -4.0, 5.0, -6.0]).unwrap();
     let x = -0.5;
 
     let derivs = p.eval_derivs(x, 6);
@@ -52,7 +50,7 @@ fn test_gsl_eval_deriv1() {
 /// Source: gsl/poly/test.c
 fn test_gsl_complex_eval1() {
     let coef = Complex64::new(0.3, 0.0);
-    let p = Polynomial::build(&vec![coef]).unwrap();
+    let p = Polynomial::build(&[coef]).unwrap();
     let x = Complex64::new(0.75, 1.2);
     let y = p.eval(x);
 
@@ -63,7 +61,7 @@ fn test_gsl_complex_eval1() {
 #[test]
 /// Source: gsl/poly/test.c
 fn test_gsl_complex_eval2() {
-    let coefs = &vec![
+    let coefs = &[
         Complex64::new(2.1, 0.0),
         Complex64::new(-1.34, 0.0),
         Complex64::new(0.76, 0.0),
@@ -80,7 +78,7 @@ fn test_gsl_complex_eval2() {
 #[test]
 /// Source: gsl/poly/test.c
 fn test_gsl_complex_eval3() {
-    let coef = &vec![Complex64::new(0.674, -1.423)];
+    let coef = &[Complex64::new(0.674, -1.423)];
     let p = Polynomial::build(coef).unwrap();
     let x = Complex64::new(-1.44, 9.55);
     let y = p.eval(x);
@@ -92,7 +90,7 @@ fn test_gsl_complex_eval3() {
 #[test]
 /// Source: gsl/poly/test.c
 fn test_gsl_complex_eval4() {
-    let coefs = &vec![
+    let coefs = &[
         Complex64::new(-2.31, 0.44),
         Complex64::new(4.21, -3.19),
         Complex64::new(0.93, 1.04),

@@ -15,6 +15,6 @@
 	- [x] Calculation of real roots of quadratic equation [`gsl_poly_solve_quadratic()`]
 	- [ ] Calculation of complex roots of quadratic equation [`gsl_poly_complex_solve_quadratic()`]
 - [ ] Cubix Equations
-	- [ ] Calculation of real roots of cubic equation [`gsl_poly_solve_cubic()`]
+	- [x] Calculation of real roots of cubic equation [`gsl_poly_solve_cubic()`]
 	- [ ] Calculation of complex roots of cubic equation [`gsl_poly_complex_solve_cubic()`]
 - [ ] General Polynomial Equations
