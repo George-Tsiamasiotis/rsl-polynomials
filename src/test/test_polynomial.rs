@@ -1,6 +1,10 @@
+use is_close::is_close;
 use num::complex::Complex64;
 
 use crate::{PolyError, Polynomial};
+
+// GSL's tests use this tolerance
+const EPS: f64 = 100.0 * f64::EPSILON;
 
 #[test]
 fn test_build_polynomial() {
@@ -73,4 +77,18 @@ fn test_monic() {
     assert_eq!(poly1.coef, vec![0.0, 2.0, 1.0]);
     assert_eq!(poly2.coef, vec![2.0, 0.0, 1.0]);
     assert_eq!(poly3.coef, vec![0.0, 1.0, 1.0]);
+}
+
+#[test]
+fn test_to_depressed_cubic() {
+    // Example: https://www.johndcook.com/blog/2022/11/19/how-to-depress-a-cubic/
+    let poly1 = Polynomial::build(&vec![22.0, 20.0, 19.0, 11.0])
+        .unwrap()
+        .to_depressed_cubic()
+        .unwrap();
+
+    assert!(is_close!(poly1.coef[0], 47972.0 / 35937.0, rel_tol = EPS));
+    assert!(is_close!(poly1.coef[1], 299.0 / 363.0, rel_tol = EPS));
+    assert!(is_close!(poly1.coef[2], 0.0, rel_tol = EPS));
+    assert!(is_close!(poly1.coef[3], 1.0, rel_tol = EPS));
 }

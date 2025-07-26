@@ -43,7 +43,7 @@ where
     /// ```
     /// # use rsl_polynomials::{Polynomial, Result};
     /// # fn main() -> Result<()> {
-    /// let poly = Polynomial::build(&vec![1.0, 4.0, 3.0])?; // 1+4x+3x²
+    /// let poly = Polynomial::build(&[1.0, 4.0, 3.0])?; // 1+4x+3x²
     /// # Ok(())
     /// # }
     /// ```
@@ -68,9 +68,9 @@ where
     /// # use rsl_polynomials::{Polynomial, Result};
     /// # fn main() -> Result<()> {
     /// // 0+x+0+2x³+0 −> x+2x³
-    /// let poly1 = Polynomial::build(&vec![0.0, 1.0, 0.0, 2.0, 0.0])?.to_trimmed();
+    /// let poly = Polynomial::build(&[0.0, 1.0, 0.0, 2.0, 0.0])?.to_trimmed();
     ///
-    /// assert_eq!(poly1.coef, vec![0.0, 1.0, 0.0, 2.0]);
+    /// assert_eq!(poly.coef, &[0.0, 1.0, 0.0, 2.0]);
     /// # Ok(())
     /// # }
     /// ```
@@ -101,9 +101,9 @@ where
     /// ```
     /// # use rsl_polynomials::{Polynomial, Result};
     /// # fn main() -> Result<()> {
-    /// let poly = Polynomial::build(&vec![30.0, 6.0, 3.0])?.to_monic();
+    /// let poly = Polynomial::build(&[30.0, 6.0, 3.0])?.to_monic();
     ///
-    /// assert_eq!(poly.coef, vec![10.0, 2.0, 1.0]);
+    /// assert_eq!(poly.coef, &[10.0, 2.0, 1.0]);
     /// # Ok(())
     /// # }
     /// ```
@@ -119,6 +119,39 @@ where
         monic
     }
 
+    /// Converts a general cubic polynomial to a depressed cubic polynomial:
+    /// ax³ + bx³ + cx + d  −> t³ + pt + q,  where t = x − b/3a
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// # use rsl_polynomials::{Polynomial, Result};
+    /// # fn main() -> Result<()> {
+    /// let poly = Polynomial::build(&[30.0, 6.0, 3.0])?.to_depressed_cubic();
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn to_depressed_cubic(&self) -> Result<Polynomial<f64>> {
+        let poly = self.to_trimmed();
+        check_if_real_coefficients(&poly.coef)?;
+        check_if_correct_order(&poly.coef, 3)?;
+
+        let mut reals = Vec::<f64>::new();
+        for c in poly.coef.iter() {
+            reals.push(convert_complex_to_real(*c)?);
+        }
+
+        let a = reals[3];
+        let b = reals[2];
+        let c = reals[1];
+        let d = reals[0];
+
+        let p = (3.0 * a * c - b.powi(2)) / (3.0 * a.powi(2));
+        let q = (2.0 * b.powi(3) - 9.0 * a * b * c + 27.0 * a.powi(2) * d) / (27.0 * a.powi(3));
+
+        Polynomial::build(&[q, p, 0.0, 1.0])
+    }
+
     /// Evaluates the polynomial for the value `x`.
     ///
     /// ## Example
@@ -126,7 +159,7 @@ where
     /// ```
     /// # use rsl_polynomials::{Polynomial, Result};
     /// # fn main() -> Result<()> {
-    /// let poly = Polynomial::build(&vec![1.0, 2.0, 3.0])?;
+    /// let poly = Polynomial::build(&[1.0, 2.0, 3.0])?;
     ///
     /// assert_eq!(poly.eval(1.0), 6.0);
     /// assert_eq!(poly.eval(-1.0), 2.0);
@@ -162,9 +195,9 @@ where
     /// ```
     /// # use rsl_polynomials::{Polynomial, Result};
     /// # fn main() -> Result<()> {
-    /// let poly = Polynomial::build(&vec![1.0, 2.0, 3.0])?;
+    /// let poly = Polynomial::build(&[1.0, 2.0, 3.0])?;
     ///
-    /// assert_eq!(poly.eval_derivs(1.0, 4), vec![6.0, 8.0, 6.0, 0.0]);
+    /// assert_eq!(poly.eval_derivs(1.0, 4), &[6.0, 8.0, 6.0, 0.0]);
     /// # Ok(())
     /// # }
     /// ```
@@ -214,7 +247,7 @@ where
     /// # use rsl_polynomials::{Polynomial, Result};
     /// #
     /// # fn main() -> Result<()> {
-    /// let poly = Polynomial::build(&vec![-20.0, 0.0, 5.0])?; // 5x²-20
+    /// let poly = Polynomial::build(&[-20.0, 0.0, 5.0])?; // 5x²-20
     /// let y = poly.solve_real_quadratic()?;
     /// let expected = vec![2.0, -2.0];
     ///
@@ -250,7 +283,7 @@ where
     /// # use rsl_polynomials::{Polynomial, Result};
     /// #
     /// # fn main() -> Result<()> {
-    /// let poly = Polynomial::build(&vec![-6.0, 11.0, -6.0, 1.0])?; // x³-6x²+11x-6
+    /// let poly = Polynomial::build(&[-6.0, 11.0, -6.0, 1.0])?; // x³-6x²+11x-6
     /// let y = poly.solve_real_cubic()?;
     /// let expected = vec![2.0, -2.0]; // TODO:
     ///
